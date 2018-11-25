@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Create By Nguyen Quy Dong</title>
+</head>
+<body>
+<!-- css -->
+<style type="text/css">
+	body{
+		margin: 0;padding: 0;
+		height: 100vh;
+		overflow: hidden;
+	}
+	canvas{
+		background-color:black;
+	}
+</style>
+<!-- css -->
+
+<!--tag canvas -->
+<canvas></canvas>
+<!--tag canvas -->
+
+<!-- js-->
+<script type="text/javascript">
+	document.addEventListener("DOMContentLoaded",function(){
+		var canvas = document.querySelector('canvas');
+		var c = canvas.getContext("2d");
+
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+
+		document.addEventListener("resize",()=>{
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeiht;
+		});
+
+		var mouse = {
+			x:undefined,
+			y:undefined
+		}
+		const arrayColor = ["#F23C50","#FFCB05","#E9F1DF","#4AD9D9","#36B1BF"];
+		const maxRadius = 40;
+		const minRadius = 5;
+		function randomColor(){
+		//	console.log(arrayColor[Math.floor(Math.random()*arrayColor.length)]);
+			return arrayColor[Math.floor(Math.random()*arrayColor.length)];
+		}
+		function createX(){
+			return Math.floor(Math.random()*canvas.width);
+		}
+		function createY(){
+			return Math.floor(Math.random()*canvas.height);
+		}
+
+		document.addEventListener("mousemove",event=>{
+			mouse.x = event.clientX;
+			mouse.y = event.clientY;
+		});
+		function Circle(x,y,radius,color){
+			this.x =x;
+			this.y =y;
+			this.radius = radius;
+			this.color = color;
+			this.velocity = {
+				x:Math.random()*4 -2,
+				y:Math.random()*4 -2
+			}
+		}
+
+		Circle.prototype.draw = function(){
+			c.save();
+			c.beginPath(); //start draw
+			c.arc(this.x,this.y,this.radius,0,2*Math.PI);
+			c.fillStyle = this.color;
+			c.shadowColor = this.color; //shadow
+			c.shadowBlur = 20;		// độ mờ shadow
+			c.fill();
+			c.closePath(); //end draw
+
+			//text
+			c.beginPath();
+			c.font ="30px source sanc pro";
+			c.fillStyle = "red";
+			c.textAlign="center";
+			c.shadowColor="white";
+      c.shadowBlur=5;
+			c.fillText("fb.com/tony.quynh", mouse.x,mouse.y);
+			c.fill();
+			c.closePath();
+			c.restore();
+		}
+
+		let arrayCircles;
+		function init(){
+			arrayCircles=[];
+			for(let i =0;i<200;i++){
+				arrayCircles.push(new Circle(createX(),createY(),5,randomColor()))
+			}
+		}
+
+		Circle.prototype.update = function(){
+			this.x += this.velocity.x;
+			this.y += this.velocity.y;
+      
+			if(mouse.x - this.x <75 && mouse.x - this.x >-75 && mouse.y - this.y < 75 && mouse.y - this.y > -75){
+				if(this.radius < maxRadius)
+					this.radius +=5;
+			}else{
+				if(this.radius>5){
+					this.radius -=2;
+					this.x += this.velocity.x *4;
+					this.y += this.velocity.y *4;
+				}
+					
+			}
+			this.collection();
+			this.draw();
+		}
+
+		Circle.prototype.collection = function(){
+			if(this.x >= canvas.width || this.x <= 0){
+				this.velocity.x = -this.velocity.x;
+			}
+			if(this.y >=canvas.height || this.y <= 0){
+				this.velocity.y = -this.velocity.y;
+			}
+		}
+
+		function animate(){
+			window.requestAnimationFrame(animate);
+
+			c.clearRect(0,0,canvas.width,canvas.height);
+
+			arrayCircles.forEach(circle=>{
+				circle.update();
+
+			});
+		}
+
+		init();
+		animate();
+
+	},false)
+</script>
+<!-- js-->
+</body>
+
+</html>
